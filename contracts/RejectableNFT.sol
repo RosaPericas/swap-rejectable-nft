@@ -168,7 +168,7 @@ contract RejectableNFT is ERC721, IRejectableNFT, Ownable {
     //-------------------------------------------------------------------------------//
 
 
-    function safeMint(address _to) public onlyOwner {
+    function safeMint(address _to) public virtual onlyOwner {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(_to, tokenId);
@@ -186,7 +186,7 @@ contract RejectableNFT is ERC721, IRejectableNFT, Ownable {
         return owner;
     }
 
-    function acceptTransfer(uint256 tokenId) public override {
+    function acceptTransfer(uint256 tokenId) public virtual override {
         require(
             _transferableOwners[tokenId] == _msgSender(),
             "RejectableNFT: accept transfer caller is not the receiver of the token"
@@ -222,7 +222,7 @@ contract RejectableNFT is ERC721, IRejectableNFT, Ownable {
         emit RejectTransfer(from, to, tokenId);
     }
 
-    function cancelTransfer(uint256 tokenId) public override {
+    function cancelTransfer(uint256 tokenId) public virtual override {
         //solhint-disable-next-line max-line-length
         require(
             // perhaps previous owner is address(0), when minting
