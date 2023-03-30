@@ -208,7 +208,7 @@ contract RejectableNFT is ERC721, IRejectableNFT, Ownable {
         emit Transfer(from, to, tokenId);
     }
 
-    function rejectTransfer(uint256 tokenId) public override {
+    function rejectTransfer(uint256 tokenId) public virtual override {
         require(
             _transferableOwners[tokenId] == _msgSender(),
             "RejectableNFT: reject transfer caller is not the receiver of the token"

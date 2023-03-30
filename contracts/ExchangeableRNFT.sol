@@ -16,7 +16,7 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
     // Token symbol
     string private _symbol;
 
-    constructor (string memory name_, string memory symbol_)  RejectableNFT(name_, symbol_){ 
+    constructor (string memory name_, string memory symbol_)  RejectableNFT(name_, symbol_) {
         _name = name_;
         _symbol = symbol_; 
     }
@@ -40,7 +40,7 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
     /**
      * @dev See {IERC721-ownerOf}.
      */
-    function ownerOf(uint256 tokenId) public view virtual override(RejectableNFT, IERC721) returns (address) {
+    function ownerOf(uint256 tokenId) public view virtual override(RejectableNFT) returns (address) {
         address owner = _owners[tokenId];
         //require(owner != address(0), "ERC721: invalid token ID");
         return owner;
@@ -104,7 +104,7 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
         public
         view
         virtual
-        override
+        override (RejectableNFT)
         returns (address)
     {
         address owner = _transferableOwners[tokenId];
@@ -122,8 +122,45 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
 
         return recipient;
     }
+/**
+     * @dev Transfers `tokenId` from `from` to `to`.
+     *  As opposed to {transferFrom}, this imposes no restrictions on msg.sender.
+     *
+     * Requirements:
+     *
+     * - `to` cannot be the zero address.
+     * - `tokenId` token must be owned by `from`.
+     *
+     * Emits a {TransferRequest} event.
+     */
+    function _transfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual override (RejectableNFT) {
+        require(
+            ExchangeableRNFT.ownerOf(tokenId) == from,
+            "ERC721: transfer from incorrect owner"
+        );
+        require(to != address(0), "ERC721: transfer to the zero address");
 
-    function transferFrom(
+        _beforeTokenTransfer(from, to, tokenId);
+
+        // Clear approvals from the previous owner
+        _approve(address(0), tokenId);
+
+        _transferableOwners[tokenId] = to;
+
+        emit TransferRequest(from, to, tokenId);
+        /* _balances[from] -= 1;
+        _balances[to] += 1;
+        _owners[tokenId] = to;
+        emit Transfer(from, to, tokenId); */
+
+        _afterTokenTransfer(from, to, tokenId);
+    }
+
+    function swapProposal(
         address from,
         address to,
         uint256 tokenId1,
@@ -133,10 +170,10 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
         //solhint-disable-next-line max-line-length
         require(
             _isApprovedOrOwner(_msgSender(), tokenId1),
-            "ERC721: transfer caller is not owner nor approved"
+            "ERNFT: transfer caller is not owner nor approved"
         );
 
-        _transfer(from, to, tokenId1, tokenId2, _deadline);
+        _swap(from, to, tokenId1, tokenId2, _deadline);
     }
 
      /**
@@ -150,7 +187,7 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
      *
      * Emits a {TransferRequest} event.
      */
-    function _transfer(
+    function _swap(
         address from,
         address to,
         uint256 tokenId1, 
@@ -176,7 +213,7 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
 
         deadline = _deadline;
 
-        emit TransferRequest(from, to, tokenId1, tokenId2, deadline);
+        emit SwapRequest(from, to, tokenId1, tokenId2, deadline);
         /* _balances[from] -= 1;
         _balances[to] += 1;
         _owners[tokenId] = to;
@@ -185,8 +222,9 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
 
         _afterTokenTransfer(from, to, tokenId1);
     }
+
     //RejectableNFT acceptransfer function
-    function acceptTransfer(uint256 tokenId) public override {  
+    function acceptTransfer(uint256 tokenId) public override (RejectableNFT) {  
         require(
             _transferableOwners[tokenId] == _msgSender(),
             "RejectableNFT: accept transfer caller is not the receiver of the token"
@@ -208,7 +246,7 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
         emit Transfer(from, to, tokenId);
     }
 
-    function acceptTransfer(uint256 tokenId1, uint256 tokenId2) public override{
+    function acceptSwap(uint256 tokenId1, uint256 tokenId2) public {
         require(
             _transferableOwners[tokenId1] == _msgSender(),
             "RejectableNFT: accept transfer caller is not the receiver of the token"
@@ -228,7 +266,7 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
         // remove the transferable owner from the mapping
         _transferableOwners[tokenId1] = address(0);
         
-        emit AcceptTransfer(from, to, tokenId1, tokenId2);
+        emit AcceptSwap(from, to, tokenId1, tokenId2);
 
         //if(tokenId2 != 0){
            // _beforeTokenTransfer(to, from, tokenId2);
@@ -248,7 +286,21 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
         //}
     }
 
-    function rejectTransfer(uint256 tokenId1, uint256 tokenId2) public {
+    function rejectTransfer(uint256 tokenId) public override {
+        require(
+            _transferableOwners[tokenId] == _msgSender(),
+            "RejectableNFT: reject transfer caller is not the receiver of the token"
+        );
+
+        address from = ExchangeableRNFT.ownerOf(tokenId);
+        address to = _msgSender();
+
+        _transferableOwners[tokenId] = address(0);
+
+        emit RejectTransfer(from, to, tokenId);
+    }
+
+    function rejectSwap(uint256 tokenId1, uint256 tokenId2) public {
         require(
             _transferableOwners[tokenId1] == _msgSender(),
             "RejectableNFT: reject transfer caller is not the receiver of the token"
@@ -266,10 +318,10 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
         _applicantRecipient[tokenId2] = address(0);
 
 
-        emit RejectTransfer(from, to, tokenId1, tokenId2);
+        emit RejectSwap(from, to, tokenId1, tokenId2);
     }
     
-    function cancelTransfer(uint256 tokenId) public override {
+    function cancelTransfer(uint256 tokenId) public override (RejectableNFT) {
         //solhint-disable-next-line max-line-length
         require(
             // perhaps previous owner is address(0), when minting
@@ -287,7 +339,7 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
 
         emit CancelTransfer(from, to, tokenId);
     }
-    function cancelTransfer(uint256 tokenId1, uint256 tokenId2) public override {
+    function cancelSwap(uint256 tokenId1, uint256 tokenId2) public {
         //solhint-disable-next-line max-line-length
         require(
             // perhaps previous owner is address(0), when minting
@@ -300,10 +352,10 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
         address from = ExchangeableRNFT.ownerOf(tokenId1);
         address to = _transferableOwners[tokenId1];
 
-        require(to != address(0), "RejectableNFT: token is not transferable");
+        require(to != address(0), "ERNFT: token is not transferable");
         _transferableOwners[tokenId1] = address(0);
-        _applicantRecipient[tokenId1] = address(0);
+        _applicantRecipient[tokenId2] = address(0);
 
-        emit CancelTransfer(from, to, tokenId1, tokenId2);
+        emit CancelSwap(from, to, tokenId1, tokenId2);
     }
 }
