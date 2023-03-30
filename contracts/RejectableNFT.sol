@@ -47,10 +47,10 @@ contract RejectableNFT is ERC721, IRejectableNFT, Ownable {
 
     /**
      * @dev See {IERC721-ownerOf}.
+     * Modified: for RejectableNFT owner can be addressZero
      */
     function ownerOf(uint256 tokenId) public view virtual override(ERC721, IERC721) returns (address) {
         address owner = _owners[tokenId];
-        //require(owner != address(0), "ERC721: invalid token ID");
         return owner;
     }
 
@@ -98,7 +98,7 @@ contract RejectableNFT is ERC721, IRejectableNFT, Ownable {
     }
     
     /**
-     * @dev Mints `tokenId` and transfers it to `to`.
+     * @dev Request the mint of `tokenId` and transfer it to `to`.
      *
      * WARNING: Usage of this method is discouraged, use {_safeMint} whenever possible
      *
@@ -118,15 +118,13 @@ contract RejectableNFT is ERC721, IRejectableNFT, Ownable {
         _transferableOwners[tokenId] = to;
 
         emit TransferRequest(address(0), to, tokenId);
-        /* _balances[to] += 1;
-        _owners[tokenId] = to;
-        emit Transfer(address(0), to, tokenId); */
 
         _afterTokenTransfer(address(0), to, tokenId);
     }
 
     /**
-     * @dev Transfers `tokenId` from `from` to `to`.
+     * @dev Request the transfer of `tokenId` from `from` to `to`.
+     *  Adds `to`as a transferable owner of `tokenId`
      *  As opposed to {transferFrom}, this imposes no restrictions on msg.sender.
      *
      * Requirements:
@@ -155,10 +153,6 @@ contract RejectableNFT is ERC721, IRejectableNFT, Ownable {
         _transferableOwners[tokenId] = to;
 
         emit TransferRequest(from, to, tokenId);
-        /* _balances[from] -= 1;
-        _balances[to] += 1;
-        _owners[tokenId] = to;
-        emit Transfer(from, to, tokenId); */
 
         _afterTokenTransfer(from, to, tokenId);
     }
@@ -167,13 +161,20 @@ contract RejectableNFT is ERC721, IRejectableNFT, Ownable {
     //                                Added functions                                //
     //-------------------------------------------------------------------------------//
 
-
+    /**
+     * @dev Safely mints a new token and transfers it to `to`.
+     * The new tokenId is consecutive with the last token minted. 
+     */
     function safeMint(address _to) public virtual onlyOwner {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(_to, tokenId);
     }
 
+    /**
+     * @dev Returns the address of `tokenId` to which it is currently offered.
+     *
+     */
     function transferableOwnerOf(uint256 tokenId)
         public
         view
@@ -186,6 +187,16 @@ contract RejectableNFT is ERC721, IRejectableNFT, Ownable {
         return owner;
     }
 
+    /**
+     * @dev `tokenId` transferableOwner accepts `tokenId`transfer.
+     * The transfer of `tokenId`to the transferableOwner is executed.
+     *
+     * Requirements:
+     *
+     * - `_msgSender` must be the `tokenId` transferable Owner.
+     *
+     * Emits a {Transfer} event.
+     */
     function acceptTransfer(uint256 tokenId) public virtual override {
         require(
             _transferableOwners[tokenId] == _msgSender(),
@@ -208,6 +219,16 @@ contract RejectableNFT is ERC721, IRejectableNFT, Ownable {
         emit Transfer(from, to, tokenId);
     }
 
+    /**
+     * @dev `tokenId` transferableOwner rejects `tokenId` transfer.
+     * The `tokenId`transferableOwner is set to addressZero.
+     *
+     * Requirements:
+     *
+     * - `_msgSender` must be the `tokenId` transferable Owner.
+     *
+     * Emits a {RejectTransfer} event.
+     */
     function rejectTransfer(uint256 tokenId) public virtual override {
         require(
             _transferableOwners[tokenId] == _msgSender(),
@@ -222,6 +243,17 @@ contract RejectableNFT is ERC721, IRejectableNFT, Ownable {
         emit RejectTransfer(from, to, tokenId);
     }
 
+    /**
+     * @dev `tokenId` owner cencels a `tokenId` transfer request.
+     * The `tokenId`transferableOwner is set to addressZero.
+     *
+     * Requirements:
+     *
+     * - `tokenId` can be non minted: `tokenId` must be addressZero and `_msgSender` must be the RejectableNFT smart contract owner.
+     * - ``_msgSender must have `tokenId` approval or must be `tokenId` owner
+     *
+     * Emits a {CancelTransfer} event.
+     */
     function cancelTransfer(uint256 tokenId) public virtual override {
         //solhint-disable-next-line max-line-length
         require(
