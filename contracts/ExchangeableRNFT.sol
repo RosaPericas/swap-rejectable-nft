@@ -46,6 +46,23 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
         return owner;
     }
 
+    /**
+     * @dev See {IERC721-balanceOf}.
+     */
+    function balanceOf(address owner)
+        public
+        view
+        virtual
+        override (RejectableNFT, IERC721)
+        returns (uint256)
+    {
+        require(
+            owner != address(0),
+            "ERC721: balance query for the zero address"
+        );
+        return _balances[owner];
+    }
+
     function safeMint(address _to) public override onlyOwner {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
@@ -266,7 +283,6 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
         // remove the transferable owner from the mapping
         _transferableOwners[tokenId1] = address(0);
         
-        emit AcceptSwap(from, to, tokenId1, tokenId2);
 
         //if(tokenId2 != 0){
            // _beforeTokenTransfer(to, from, tokenId2);
@@ -279,8 +295,13 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
                 _balances[to] -= 1;
                 _balances[from] += 1;
            // } */
+        
+        // remove the applicant recipient from the mapping
+        _applicantRecipient[tokenId2] = address(0);
 
             _owners[tokenId2] = from;
+
+        emit AcceptSwap(from, to, tokenId1, tokenId2);
 
            // _afterTokenTransfer(to, from, tokenId2);
         //}

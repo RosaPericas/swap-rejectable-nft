@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "hardhat test test/00_RejectableNFT.test.ts --network hardhat"
+    "test": "hardhat test test/00_RejectableNFT.test.ts --network hardhat",
+    "test:ERNFT": "hardhat test test/01_ExchangeableRNFT.test.ts --network hardhat"
   },
   "author": "Rosa Pericàs Gornals",
   "license": "MIT",

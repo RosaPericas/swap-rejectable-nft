@@ -43,16 +43,6 @@ interface IExchangeableRNFT is IRejectableNFT{
     );
 
     /**
-     * @dev Emitted when receiver `to` rejects `tokenId1` for `tokenId2` transfer from `from` to `to`.
-     */
-    event RejectTransfer(
-        address indexed from,
-        address indexed to,
-        uint256 tokenId1,
-        uint256 tokenId2
-    );
-
-    /**
      * @dev Emitted when sender `to` cancels `tokenId1` for `tokenId2` swap from `from` to `to`.
      */
     event CancelSwap(
