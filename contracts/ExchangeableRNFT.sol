@@ -40,7 +40,7 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
     /**
      * @dev See {IERC721-ownerOf}.
      */
-    function ownerOf(uint256 tokenId) public view virtual override(RejectableNFT) returns (address) {
+    function ownerOf(uint256 tokenId) public view virtual override(RejectableNFT, IERC721) returns (address) {
         address owner = _owners[tokenId];
         //require(owner != address(0), "ERC721: invalid token ID");
         return owner;
@@ -104,7 +104,7 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
         public
         view
         virtual
-        override (RejectableNFT)
+        override (RejectableNFT, IRejectableNFT)
         returns (address)
     {
         address owner = _transferableOwners[tokenId];
@@ -224,7 +224,7 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
     }
 
     //RejectableNFT acceptransfer function
-    function acceptTransfer(uint256 tokenId) public override (RejectableNFT) {  
+    function acceptTransfer(uint256 tokenId) public override (RejectableNFT, IRejectableNFT) {  
         require(
             _transferableOwners[tokenId] == _msgSender(),
             "RejectableNFT: accept transfer caller is not the receiver of the token"
@@ -286,7 +286,7 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
         //}
     }
 
-    function rejectTransfer(uint256 tokenId) public override {
+    function rejectTransfer(uint256 tokenId) public override(RejectableNFT, IRejectableNFT) {
         require(
             _transferableOwners[tokenId] == _msgSender(),
             "RejectableNFT: reject transfer caller is not the receiver of the token"
@@ -321,7 +321,7 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
         emit RejectSwap(from, to, tokenId1, tokenId2);
     }
     
-    function cancelTransfer(uint256 tokenId) public override (RejectableNFT) {
+    function cancelTransfer(uint256 tokenId) public override (RejectableNFT, IRejectableNFT) {
         //solhint-disable-next-line max-line-length
         require(
             // perhaps previous owner is address(0), when minting
