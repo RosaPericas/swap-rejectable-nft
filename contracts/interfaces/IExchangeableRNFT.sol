@@ -22,16 +22,6 @@ interface IExchangeableRNFT is IRejectableNFT{
         uint256 deadline
     );
 
-    /**
-     * @dev Emitted when receiver `to` rejects `tokenId1` for `tokenId2` swap from `from` to `to`.
-     */
-    event RejectSwap(
-        address indexed from,
-        address indexed to,
-        uint256 tokenId1,
-        uint256 tokenId2
-    );
-
      /**
      * @dev Emitted when sender `from` accepts `tokenId1` for `tokenId2`swap from `from` to `to`.
      */
@@ -59,14 +49,6 @@ interface IExchangeableRNFT is IRejectableNFT{
      * @param tokenId2 ID of the token to be sent
      */
     function acceptSwap(uint256 tokenId1, uint256 tokenId2) external;
-
-    /**
-     * @dev Rejects the swap of `tokenId1` for `tokenId2` 
-     * The caller must be the current transferable owner of the `tokenId2`
-     * @param tokenId1 ID of the token to be received
-     * @param tokenId2 ID of the token to be sent
-     */
-    function rejectSwap(uint256 tokenId1, uint256 tokenId2) external; 
     
     /**
      * @dev Cancels the swap of `tokenId1` for `tokenId2` 

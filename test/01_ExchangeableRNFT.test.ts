@@ -560,12 +560,36 @@ describe("ExchangeableRNFT", () => {
             user1.address
         )
       });
-  
-      it("Sender can cancel", async () => {
+
+      it("Sender can't cancel the proposal if now < deadline", async () => {
         // swap proposal opened by user1
         await exchangeableRNFT
           .connect(user1)
           .swapProposal(user1.address, user2.address, 0, 1, deadline);
+        // user1 is still the owner of the token
+        expect(await exchangeableRNFT.ownerOf(0)).to.be.equal(user1.address);
+        // user2 is still the owner of token 1
+        expect(await exchangeableRNFT.ownerOf(1)).to.be.equal(user2.address);
+        // the receiver is the transferable owner
+        expect(await exchangeableRNFT.transferableOwnerOf(0)).to.be.equal(
+          user2.address
+        );
+        // the sender of the proposal is the applicant recipient
+        expect(await exchangeableRNFT.applicantRecipient(1)).to.be.equal(
+            user1.address
+        )
+        // the sender can't cancel swap
+        await expect(exchangeableRNFT.connect(user2).cancelSwap(0,1)).to.be.reverted;
+      });
+
+      it("Sender can cancel", async () => {
+        const deadline = Math.floor(Date.now() / 1000) + 60 * 1; // 1 minute from now
+        // swap proposal opened by user1
+        await exchangeableRNFT
+          .connect(user1)
+          .swapProposal(user1.address, user2.address, 0, 1, deadline);
+        // wait the deadline expiration 
+        await new Promise(resolve => setTimeout(resolve, 60000));
         // user1 is still the owner of the token
         expect(await exchangeableRNFT.ownerOf(0)).to.be.equal(user1.address);
         // user2 is still the owner of token 1
@@ -595,7 +619,7 @@ describe("ExchangeableRNFT", () => {
         expect(await exchangeableRNFT.ownerOf(1)).to.be.equal(user2.address);
       });
 
-      it("Receiver can't reject the swap if the deadline has passed", async () => {
+      /* it("Receiver can't reject the swap if the deadline has passed", async () => {
         const shortDeadline =  Math.floor(Date.now() / 1000); //now
         // user 1 opens swap proposal with a short deadline
         await exchangeableRNFT
@@ -647,7 +671,7 @@ describe("ExchangeableRNFT", () => {
         expect(await exchangeableRNFT.ownerOf(0)).to.be.equal(user1.address);
         // user2 is still the owner of token 1
         expect(await exchangeableRNFT.ownerOf(1)).to.be.equal(user2.address);
-      });
+      }); */
   
       it("Receiver can't accept the swap if the deadline has passed", async () => {
         const shortDeadline =  Math.floor(Date.now() / 1000); //now
