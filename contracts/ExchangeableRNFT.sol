@@ -265,7 +265,7 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
     }
 
     function acceptSwap(uint256 tokenId1, uint256 tokenId2) public {
-        require(swapProp[tokenId1].opened && swapProp[tokenId2].opened, "Any swap proposal for the provided tokens currently open");
+        require(swapProp[tokenId1].opened && swapProp[tokenId2].opened, "ERNFT: Any swap proposal for the provided tokens currently open");
         
         require(
             _isApprovedOrOwner(_msgSender(), tokenId2),
@@ -287,9 +287,9 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
             swapProp[tokenId2].to, 
             swapProp[tokenId2].deadline, 
             swapProp[tokenId2].opened)
-        ), "Different swapProp properties");
+        ), "ERNFT: Different swapProp properties");
 
-        require(block.timestamp < swapProp[tokenId1].deadline, "Deadline expired");
+        require(block.timestamp < swapProp[tokenId1].deadline, "ERNFT: Deadline expired");
 
         address from = swapProp[tokenId1].from;
         address to = swapProp[tokenId2].to;
@@ -334,7 +334,6 @@ contract ExchangeableRNFT is RejectableNFT, IExchangeableRNFT {
         address from = ExchangeableRNFT.ownerOf(tokenId);
         address to = _transferableOwners[tokenId];
 
-        require(to != address(0), "ERNFT: token is not transferable");
         _transferableOwners[tokenId] = address(0);
 
         emit CancelTransfer(from, to, tokenId);
