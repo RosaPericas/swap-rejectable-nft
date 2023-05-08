@@ -33,7 +33,7 @@ interface IExchangeableRNFT is IRejectableNFT{
     );
 
     /**
-     * @dev Emitted when sender `to` cancels `tokenId1` for `tokenId2` swap from `from` to `to`.
+     * @dev Emitted when sender `from` cancels `tokenId1` for `tokenId2` swap from `from` to `to`.
      */
     event CancelSwap(
         address indexed from,

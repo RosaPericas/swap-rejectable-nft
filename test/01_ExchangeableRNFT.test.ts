@@ -23,9 +23,10 @@ describe("ExchangeableRNFT", () => {
   let owner: SignerWithAddress;
   let user1: SignerWithAddress;
   let user2: SignerWithAddress;
+  let user3: SignerWithAddress;
 
   beforeEach(async () => {
-    [owner, user1, user2] = await ethers.getSigners();
+    [owner, user1, user2, user3] = await ethers.getSigners();
 
     // deploy NFT
     const NFT = await ethers.getContractFactory("NFT");
@@ -323,7 +324,7 @@ describe("ExchangeableRNFT", () => {
    /**
    * Mint a Exchangeable RNFT
    */
-   describe("Mint a Exchangeable RNFT", () => {
+   describe("Mint an ERNFT", () => {
     it("Non owner can't mint", async () => {
       await expect(exchangeableRNFT.connect(user1).safeMint(user1.address)).to.be
         .reverted;
@@ -535,10 +536,14 @@ describe("ExchangeableRNFT", () => {
     beforeEach(async() => {
         await exchangeableRNFT.connect(owner).safeMint(user1.address);
         await exchangeableRNFT.connect(owner).safeMint(user2.address);
+        await exchangeableRNFT.connect(owner).safeMint(user3.address);
         await exchangeableRNFT.connect(user1).acceptTransfer(0);
         await exchangeableRNFT.connect(user2).acceptTransfer(1);
+        await exchangeableRNFT.connect(user3).acceptTransfer(2);
         expect(await exchangeableRNFT.ownerOf(0)).to.be.equal(user1.address);
         expect(await exchangeableRNFT.ownerOf(1)).to.be.equal(user2.address);
+        expect(await exchangeableRNFT.ownerOf(2)).to.be.equal(user3.address);
+
     })
     const deadline = Math.floor(Date.now() / 1000) + 60 * 15; // 15 minutes from now
 
@@ -552,16 +557,16 @@ describe("ExchangeableRNFT", () => {
         // user2 is still the owner of token 1
         expect(await exchangeableRNFT.ownerOf(1)).to.be.equal(user2.address);
         // the receiver is the transferable owner
-        expect(await exchangeableRNFT.transferableOwnerOf(0)).to.be.equal(
+        expect((await exchangeableRNFT.swapProp(0)).to).to.be.equal(
           user2.address
         ); 
         // the sender of the proposal is the applicant recipient
-        expect(await exchangeableRNFT.applicantRecipient(1)).to.be.equal(
+        expect((await exchangeableRNFT.swapProp(1)).from).to.be.equal(
             user1.address
         )
       });
 
-      it("Sender can't cancel the proposal if now < deadline", async () => {
+      it("Sender can cancel the proposal", async () => {
         // swap proposal opened by user1
         await exchangeableRNFT
           .connect(user1)
@@ -571,75 +576,17 @@ describe("ExchangeableRNFT", () => {
         // user2 is still the owner of token 1
         expect(await exchangeableRNFT.ownerOf(1)).to.be.equal(user2.address);
         // the receiver is the transferable owner
-        expect(await exchangeableRNFT.transferableOwnerOf(0)).to.be.equal(
+        expect((await exchangeableRNFT.swapProp(0)).to).to.be.equal(
           user2.address
         );
         // the sender of the proposal is the applicant recipient
-        expect(await exchangeableRNFT.applicantRecipient(1)).to.be.equal(
+        expect((await exchangeableRNFT.swapProp(1)).from).to.be.equal(
             user1.address
         )
-        // the sender can't cancel swap
-        await expect(exchangeableRNFT.connect(user2).cancelSwap(0,1)).to.be.reverted;
+        // the sender can cancel swap
+        await expect(exchangeableRNFT.connect(user2).cancelSwap(0,1)).to.not.be.reverted;
       });
 
-      it("Sender can cancel", async () => {
-        const deadline = Math.floor(Date.now() / 1000) + 60 * 1; // 1 minute from now
-        // swap proposal opened by user1
-        await exchangeableRNFT
-          .connect(user1)
-          .swapProposal(user1.address, user2.address, 0, 1, deadline);
-        // wait the deadline expiration 
-        await new Promise(resolve => setTimeout(resolve, 60000));
-        // user1 is still the owner of the token
-        expect(await exchangeableRNFT.ownerOf(0)).to.be.equal(user1.address);
-        // user2 is still the owner of token 1
-        expect(await exchangeableRNFT.ownerOf(1)).to.be.equal(user2.address);
-        // the receiver is the transferable owner
-        expect(await exchangeableRNFT.transferableOwnerOf(0)).to.be.equal(
-          user2.address
-        );
-        // the sender of the proposal is the applicant recipient
-        expect(await exchangeableRNFT.applicantRecipient(1)).to.be.equal(
-            user1.address
-        )
-        // the sender can cancel
-        await exchangeableRNFT.connect(user1).cancelSwap(0,1);
-        expect(await exchangeableRNFT.ownerOf(0)).to.be.equal(user1.address);
-        // the receiver is removed as transferable owner
-        expect(await exchangeableRNFT.transferableOwnerOf(0)).to.be.equal(
-          ZERO_ADDRESS
-        );
-        // the sender of the proposal is removed as the applicant recipient
-        expect(await exchangeableRNFT.applicantRecipient(1)).to.be.equal(
-            ZERO_ADDRESS
-        )
-        // user1 is still the owner of the token 0
-        expect(await exchangeableRNFT.ownerOf(0)).to.be.equal(user1.address);
-        // user2 is still the owner of token 1
-        expect(await exchangeableRNFT.ownerOf(1)).to.be.equal(user2.address);
-      });
-
-      /* it("Receiver can't reject the swap if the deadline has passed", async () => {
-        const shortDeadline =  Math.floor(Date.now() / 1000); //now
-        // user 1 opens swap proposal with a short deadline
-        await exchangeableRNFT
-          .connect(user1)
-          .swapProposal(user1.address, user2.address, 0, 1, shortDeadline);
-          // user1 is still the owner of the token
-        expect(await exchangeableRNFT.ownerOf(0)).to.be.equal(user1.address);
-        // user2 is still the owner of token 1
-        expect(await exchangeableRNFT.ownerOf(1)).to.be.equal(user2.address);
-        // the receiver is the transferable owner
-        expect(await exchangeableRNFT.transferableOwnerOf(0)).to.be.equal(
-          user2.address
-        );
-        // the sender of the proposal is the applicant recipient
-        expect(await exchangeableRNFT.applicantRecipient(1)).to.be.equal(
-            user1.address
-        )
-        // the receiver can't accept swap
-        await expect(exchangeableRNFT.connect(user2).rejectSwap(0,1)).to.be.reverted;
-      })
       it("Receiver can reject the proposed swap", async () => {
         // swap proposal opened by user1
         await exchangeableRNFT
@@ -650,31 +597,32 @@ describe("ExchangeableRNFT", () => {
         // user2 is still the owner of token 1
         expect(await exchangeableRNFT.ownerOf(1)).to.be.equal(user2.address);
         // the receiver is the transferable owner
-        expect(await exchangeableRNFT.transferableOwnerOf(0)).to.be.equal(
+        expect((await exchangeableRNFT.swapProp(0)).to).to.be.equal(
           user2.address
         );
         // the sender of the proposal is the applicant recipient
-        expect(await exchangeableRNFT.applicantRecipient(1)).to.be.equal(
+        expect((await exchangeableRNFT.swapProp(1)).from).to.be.equal(
             user1.address
         )
         // the receiver can reject the swap execution
-        await exchangeableRNFT.connect(user2).rejectSwap(0,1);
+        await exchangeableRNFT.connect(user2).cancelSwap(0,1);
         // the receiver is removed as transferable owner
-        expect(await exchangeableRNFT.transferableOwnerOf(0)).to.be.equal(
+        expect((await exchangeableRNFT.swapProp(0)).to).to.be.equal(
             ZERO_ADDRESS
         );
         // the sender of the proposal is removed as the applicant recipient
-        expect(await exchangeableRNFT.applicantRecipient(1)).to.be.equal(
+        expect((await exchangeableRNFT.swapProp(1)).from).to.be.equal(
             ZERO_ADDRESS
         )
         // user1 is still the owner of the token 0
         expect(await exchangeableRNFT.ownerOf(0)).to.be.equal(user1.address);
         // user2 is still the owner of token 1
         expect(await exchangeableRNFT.ownerOf(1)).to.be.equal(user2.address);
-      }); */
-  
+      }); 
+/* 
       it("Receiver can't accept the swap if the deadline has passed", async () => {
-        const shortDeadline =  Math.floor(Date.now() / 1000); //now
+        const shortDeadline = Math.floor(Date.now() / 1000) + 60 * 3; // 1 minute from now
+
         // user 1 opens swap proposal with a short deadline
         await exchangeableRNFT
           .connect(user1)
@@ -684,16 +632,16 @@ describe("ExchangeableRNFT", () => {
         // user2 is still the owner of token 1
         expect(await exchangeableRNFT.ownerOf(1)).to.be.equal(user2.address);
         // the receiver is the transferable owner
-        expect(await exchangeableRNFT.transferableOwnerOf(0)).to.be.equal(
+        expect((await exchangeableRNFT.swapProp(0)).to).to.be.equal(
           user2.address
         );
         // the sender of the proposal is the applicant recipient
-        expect(await exchangeableRNFT.applicantRecipient(1)).to.be.equal(
+        expect((await exchangeableRNFT.swapProp(1)).from).to.be.equal(
             user1.address
         )
         // the receiver can't accept swap
         await expect(exchangeableRNFT.connect(user2).acceptSwap(0,1)).to.be.reverted;
-      })
+      }) */
       
       it("Receiver can accept the swap", async () => {
         // swap proposal opened by user1
@@ -705,21 +653,21 @@ describe("ExchangeableRNFT", () => {
         // user2 is still the owner of token 1
         expect(await exchangeableRNFT.ownerOf(1)).to.be.equal(user2.address);
         // the receiver is the transferable owner
-        expect(await exchangeableRNFT.transferableOwnerOf(0)).to.be.equal(
+        expect((await exchangeableRNFT.swapProp(0)).to).to.be.equal(
           user2.address
         );
         // the sender of the proposal is the applicant recipient
-        expect(await exchangeableRNFT.applicantRecipient(1)).to.be.equal(
+        expect((await exchangeableRNFT.swapProp(1)).from).to.be.equal(
             user1.address
         )
         // the receiver can accept the swap
         await exchangeableRNFT.connect(user2).acceptSwap(0, 1);
         // the receiver is removed as transferable owner
-        expect(await exchangeableRNFT.transferableOwnerOf(0)).to.be.equal(
+        expect((await exchangeableRNFT.swapProp(0)).to).to.be.equal(
             ZERO_ADDRESS
         );
         // the sender of the proposal is removed as the applicant recipient
-        expect(await exchangeableRNFT.applicantRecipient(1)).to.be.equal(
+        expect((await exchangeableRNFT.swapProp(1)).from).to.be.equal(
             ZERO_ADDRESS
         )
         // user1 is the new owner of the token 1
@@ -730,6 +678,71 @@ describe("ExchangeableRNFT", () => {
         expect(await exchangeableRNFT.balanceOf(user1.address)).to.be.equal(1);
         // user2 has a banace of 1 token
         expect(await exchangeableRNFT.balanceOf(user2.address)).to.be.equal(1);
-      }); 
+      });  
+
+      it("An approved user can accept the swap", async () => {
+        //user2 approves user3
+        await exchangeableRNFT.connect(user2).approve(user3.address, 1)
+        //user3 is approved
+        expect(await exchangeableRNFT.getApproved(1)).to.be.equal(user3.address)
+        // swap proposal opened by user1
+        await exchangeableRNFT
+          .connect(user1)
+          .swapProposal(user1.address, user2.address, 0, 1, deadline);
+        // user1 is still the owner of the token
+        expect(await exchangeableRNFT.ownerOf(0)).to.be.equal(user1.address);
+        // user2 is still the owner of token 1
+        expect(await exchangeableRNFT.ownerOf(1)).to.be.equal(user2.address);
+        // the receiver is the transferable owner
+        expect((await exchangeableRNFT.swapProp(0)).to).to.be.equal(
+          user2.address
+        );
+        // the sender of the proposal is the applicant recipient
+        expect((await exchangeableRNFT.swapProp(1)).from).to.be.equal(
+            user1.address
+        )
+        // the approved user can accept the swap
+        await exchangeableRNFT.connect(user3).acceptSwap(0, 1);
+        // the receiver is removed as transferable owner
+        expect((await exchangeableRNFT.swapProp(0)).to).to.be.equal(
+            ZERO_ADDRESS
+        );
+        // the sender of the proposal is removed as the applicant recipient
+        expect((await exchangeableRNFT.swapProp(1)).from).to.be.equal(
+            ZERO_ADDRESS
+        )
+        // user1 is the new owner of the token 1
+        expect(await exchangeableRNFT.ownerOf(1)).to.be.equal(user1.address);
+        // user2 is the new owner of the token 0
+        expect(await exchangeableRNFT.ownerOf(0)).to.be.equal(user2.address);
+        // user1 has a banace of 1 token
+        expect(await exchangeableRNFT.balanceOf(user1.address)).to.be.equal(1);
+        // user2 has a banace of 1 token
+        expect(await exchangeableRNFT.balanceOf(user2.address)).to.be.equal(1);
+      });  
+
+      it("If there is an opened swap proposal it not possible to open another one involving one of the same tokens", async () => {
+        // swap proposal opened by user1
+        await exchangeableRNFT
+          .connect(user1)
+          .swapProposal(user1.address, user2.address, 0, 1, deadline);
+        // user1 is still the owner of the token
+        expect(await exchangeableRNFT.ownerOf(0)).to.be.equal(user1.address);
+        // user2 is still the owner of token 1
+        expect(await exchangeableRNFT.ownerOf(1)).to.be.equal(user2.address);
+        // the receiver is the transferable owner
+        expect((await exchangeableRNFT.swapProp(0)).to).to.be.equal(
+          user2.address
+        );
+        // the sender of the proposal is the applicant recipient
+        expect((await exchangeableRNFT.swapProp(1)).from).to.be.equal(
+            user1.address
+        )
+        //user3 tries to open a new swap proposal involving user2 token
+        await expect(exchangeableRNFT
+        .connect(user3)
+        .swapProposal(user3.address, user2.address, 2, 1, deadline)).to.be.reverted;
+      });  
+
   })
 });

@@ -13,6 +13,7 @@ dotenvConfig({ path: resolve(__dirname, "./.env") });
 const CHAIN_IDS = {
   HARDHAT: 1337,
   MAINNET: 1,
+  POLYGON: 137,
   RINKEBY: 4
 };
 
@@ -24,11 +25,11 @@ const getInfuraURL = (network: string) => {
   return `https://${network}.infura.io/v3/${INFURA_API_KEY}`;
 };
 
-const config: HardhatUserConfig = {
+const config = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
-      chainId: CHAIN_IDS.HARDHAT,
+      chainId: CHAIN_IDS.POLYGON,
       accounts: { mnemonic: MNEMONIC }
     },
     mainnet: {
@@ -58,11 +59,11 @@ const config: HardhatUserConfig = {
   mocha: {
     timeout: 8000000
   },
-  /* gasReporter: {
+  gasReporter: {
     currency: "USD",
     coinmarketcap: COINMARKETCAP_API_KEY
   }, 
-  namedAccounts: {
+  /*namedAccounts: {
     deployer: {
       default: 0 // Here this will by default take the first account as deployer
     }
