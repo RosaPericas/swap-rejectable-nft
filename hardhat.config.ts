@@ -29,8 +29,10 @@ const config = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
-      chainId: CHAIN_IDS.POLYGON,
-      accounts: { mnemonic: MNEMONIC }
+      chainId: CHAIN_IDS.HARDHAT,
+      accounts: { mnemonic: MNEMONIC },
+      blockGasLimit: 4000000,
+      gas: "auto"
     },
     mainnet: {
       url: getInfuraURL("mainnet"),
@@ -61,8 +63,11 @@ const config = {
   },
   gasReporter: {
     currency: "USD",
-    coinmarketcap: COINMARKETCAP_API_KEY
-  }, 
+    coinmarketcap: COINMARKETCAP_API_KEY,
+    token: "ETH",//"MATIC",
+    gasPriceApi:
+      "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice" //"https://api.polygonscan.com/api?module=proxy&action=eth_gasPrice"
+  },
   /*namedAccounts: {
     deployer: {
       default: 0 // Here this will by default take the first account as deployer
