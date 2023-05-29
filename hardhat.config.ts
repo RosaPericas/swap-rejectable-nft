@@ -1,7 +1,6 @@
 import { config as dotenvConfig } from "dotenv";
 import { resolve } from "path";
 import { HardhatUserConfig } from "hardhat/types";
-import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-solhint";
 import "hardhat-deploy";

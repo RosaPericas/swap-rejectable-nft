@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
  * @dev Iterface that inherits from a Non-Fungible Token Standard, and it also adds
  * the possibility to be rejected by the receiver of the transfer function.
  */
-interface IRejectableNFT is IERC721 {
+interface IRejNFT is IERC721 {
     /**
      * @dev Emitted when `tokenId` token is proposed to be transferred from `from` sender to `to` receiver.
      */

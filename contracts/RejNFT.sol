@@ -1,77 +1,26 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.12;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "./interfaces/IRejectableNFT.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract RejectableNFT is ERC721, IRejectableNFT, Ownable {
+import "./NFT.sol";
+import "./interfaces/IRejNFT.sol";
+
+contract RejNFT is ERC721, IRejNFT, Ownable {
     using Counters for Counters.Counter;
 
-    Counters.Counter private _tokenIdCounter;
+    Counters.Counter internal _tokenIdCounter;
 
-    // Mapping from token ID to owner address
-    mapping(uint256 => address) private _owners;
-
-    // Mapping owner address to token count
-    mapping(address => uint256) private _balances;
-    
     // Mapping from token ID to transferable owner
-    mapping(uint256 => address) private _transferableOwners;
+    mapping(uint256 => address) internal _transferableOwners;
 
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
      * overrides ERC721 constructor
      */
-    constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_)
-    { }
-    
-    /**
-     * @dev See {IERC721-balanceOf}.
-     */
-    function balanceOf(address owner)
-        public
-        view
-        virtual
-        override (ERC721, IERC721)
-        returns (uint256)
-    {
-        require(
-            owner != address(0),
-            "ERC721: balance query for the zero address"
-        );
-        return _balances[owner];
-    }
-
-    /**
-     * @dev See {IERC721-ownerOf}.
-     * Modified: for RejectableNFT owner can be addressZero
-     */
-    function ownerOf(uint256 tokenId) public view virtual override(ERC721, IERC721) returns (address) {
-        address owner = _owners[tokenId];
-        return owner;
-    }
-
-    /**
-     * @dev Returns the owner of the `tokenId`. Does NOT revert if token doesn't exist
-     */
-    function _ownerOf(uint256 tokenId) internal view virtual override (ERC721) returns (address) {
-        return _owners[tokenId];
-    } 
-
-    /**
-     * @dev Returns whether `tokenId` exists.
-     *
-     * Tokens can be managed by their owner or approved accounts via {approve} or {setApprovalForAll}.
-     *
-     * Tokens start existing when they are minted (`_mint`),
-     * and stop existing when they are burned (`_burn`).
-     */
-    function _exists(uint256 tokenId) internal view virtual override ( ERC721 ) returns (bool) {
-        return _ownerOf(tokenId) != address(0);
-    }
+    constructor(string memory name_, string memory symbol_) 
+        ERC721(name_, symbol_)
+        { }
 
     /**
      * @dev Returns whether `spender` is allowed to manage `tokenId`.
@@ -91,7 +40,7 @@ contract RejectableNFT is ERC721, IRejectableNFT, Ownable {
             _exists(tokenId),
             "ERC721: operator query for nonexistent token"
         );
-        address owner = RejectableNFT.ownerOf(tokenId);
+        address owner = ownerOf(tokenId);
         return (spender == owner ||
             isApprovedForAll(owner, spender) ||
             getApproved(tokenId) == spender);
@@ -140,7 +89,7 @@ contract RejectableNFT is ERC721, IRejectableNFT, Ownable {
         uint256 tokenId
     ) internal virtual override (ERC721) {
         require(
-            RejectableNFT.ownerOf(tokenId) == from,
+            ownerOf(tokenId) == from,
             "ERC721: transfer from incorrect owner"
         );
         require(to != address(0), "ERC721: transfer to the zero address");
@@ -199,11 +148,11 @@ contract RejectableNFT is ERC721, IRejectableNFT, Ownable {
      */
     function acceptTransfer(uint256 tokenId) public virtual override {
         require(
-            _transferableOwners[tokenId] == _msgSender(),
+            _transferableOwners[tokenId] == _msgSender() || _isApprovedOrOwner(_msgSender(), tokenId),
             "RejectableNFT: accept transfer caller is not the receiver of the token"
         );
 
-        address from = RejectableNFT.ownerOf(tokenId);
+        address from = ownerOf(tokenId);
         address to = _msgSender();
 
         if (from != address(0)) {
@@ -235,7 +184,7 @@ contract RejectableNFT is ERC721, IRejectableNFT, Ownable {
             "RejectableNFT: reject transfer caller is not the receiver of the token"
         );
 
-        address from = RejectableNFT.ownerOf(tokenId);
+        address from = ownerOf(tokenId);
         address to = _msgSender();
 
         _transferableOwners[tokenId] = address(0);
@@ -258,13 +207,13 @@ contract RejectableNFT is ERC721, IRejectableNFT, Ownable {
         //solhint-disable-next-line max-line-length
         require(
             // perhaps previous owner is address(0), when minting
-            (RejectableNFT.ownerOf(tokenId) == address(0) &&
+            (ownerOf(tokenId) == address(0) &&
                 owner() == _msgSender()) ||
                 _isApprovedOrOwner(_msgSender(), tokenId),
             "ERC721: transfer caller is not owner nor approved"
         );
 
-        address from = RejectableNFT.ownerOf(tokenId);
+        address from = ownerOf(tokenId);
         address to = _transferableOwners[tokenId];
 
         require(to != address(0), "RejectableNFT: token is not transferable");

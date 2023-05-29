@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.12;
 
-import "./IRejectableNFT.sol";
+import "./IRejNFT.sol";
 
 /**
  * @title  Exchangeable Rejectable NFT interface
  * @dev Iterface that inherits from the Rejectable NFT interface, and it also adds
  * the possibility to request, reject and accept a rejectable NFT swap.
  */
-interface IExchangeableRNFT is IRejectableNFT{
+interface IExNFT is IRejNFT{
 
     /**
      * @dev Emitted when `tokenId1` for `tokenId2` swap is proposed from `from` sender to `to` receiver, with an specified `deadline`.
