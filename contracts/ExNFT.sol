@@ -15,7 +15,6 @@ contract ExNFT is RejNFT, IExNFT {
         uint256 tokenId1;
         uint256 tokenId2;
         uint256 deadline;
-        bool opened;
     }
 
     mapping(uint256 => proposal) public swapProp;
@@ -72,7 +71,7 @@ contract ExNFT is RejNFT, IExNFT {
         // Clear approvals from the previous owner
         _approve(address(0), tokenId1);
 
-        swapProp[tokenId1] = proposal(from, to, tokenId1, tokenId2, deadline, true);
+        swapProp[tokenId1] = proposal(from, to, tokenId1, tokenId2, deadline);
         newProposal[tokenId1] = true;
         newProposal[tokenId2] = true;
 
@@ -107,7 +106,7 @@ contract ExNFT is RejNFT, IExNFT {
         emit AcceptSwap(from, to, tokenId1, tokenId2);
     }
 
-    function cancelSwap(uint256 tokenId1, uint256 tokenId2) public {
+    function rejectOrCancelSwap(uint256 tokenId1, uint256 tokenId2) public {
         require(newProposal[tokenId1] && newProposal[tokenId2], "ExNFT: Any swap proposal for the provided tokens currently open");
         
         require(
@@ -123,6 +122,6 @@ contract ExNFT is RejNFT, IExNFT {
         newProposal[tokenId1] = false;
         newProposal[tokenId2] = false;
 
-        emit CancelSwap(from, to, tokenId1, tokenId2);
+        emit RejectOrCancelSwap(from, to, tokenId1, tokenId2);
     }
 }

@@ -35,7 +35,7 @@ interface IExNFT is IRejNFT{
     /**
      * @dev Emitted when sender `from` cancels `tokenId1` for `tokenId2` swap from `from` to `to`.
      */
-    event CancelSwap(
+    event RejectOrCancelSwap(
         address indexed from,
         address indexed to,
         uint256 tokenId1,
@@ -56,5 +56,5 @@ interface IExNFT is IRejNFT{
      * @param tokenId1 ID of the token proposed to send
      * @param tokenId2 ID of the token proposed to receive
      */
-    function cancelSwap(uint256 tokenId1, uint256 tokenId2) external;
+    function rejectOrCancelSwap(uint256 tokenId1, uint256 tokenId2) external;
 }
