@@ -149,7 +149,7 @@ contract RejNFT is ERC721, IRejNFT, Ownable {
     function acceptTransfer(uint256 tokenId) public virtual override {
         require(
             _transferableOwners[tokenId] == _msgSender() || _isApprovedOrOwner(_msgSender(), tokenId),
-            "RejectableNFT: accept transfer caller is not the receiver of the token"
+            "RejNFT: accept transfer caller is not the receiver of the token"
         );
 
         address from = ownerOf(tokenId);
@@ -181,7 +181,7 @@ contract RejNFT is ERC721, IRejNFT, Ownable {
     function rejectTransfer(uint256 tokenId) public virtual {
         require(
             _transferableOwners[tokenId] == _msgSender(),
-            "RejectableNFT: reject transfer caller is not the receiver of the token"
+            "RejNFT: reject transfer caller is not the receiver of the token"
         );
 
         address from = ownerOf(tokenId);
@@ -216,7 +216,7 @@ contract RejNFT is ERC721, IRejNFT, Ownable {
         address from = ownerOf(tokenId);
         address to = _transferableOwners[tokenId];
 
-        require(to != address(0), "RejectableNFT: token is not transferable");
+        require(to != address(0), "RejNFT: token is not transferable");
         _transferableOwners[tokenId] = address(0);
 
         emit CancelTransfer(from, to, tokenId);

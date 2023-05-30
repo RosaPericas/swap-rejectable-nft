@@ -559,10 +559,6 @@ describe("ExchangeableRNFT", () => {
         expect((await exchangeableRNFT.swapProp(0)).to).to.be.equal(
           user2.address
         ); 
-        // the sender of the proposal is the applicant recipient
-        expect((await exchangeableRNFT.swapProp(1)).from).to.be.equal(
-            user1.address
-        )
       });
 
       it("Sender can cancel the proposal", async () => {
@@ -578,10 +574,6 @@ describe("ExchangeableRNFT", () => {
         expect((await exchangeableRNFT.swapProp(0)).to).to.be.equal(
           user2.address
         );
-        // the sender of the proposal is the applicant recipient
-        expect((await exchangeableRNFT.swapProp(1)).from).to.be.equal(
-            user1.address
-        )
         // the sender can cancel swap
         await expect(exchangeableRNFT.connect(user2).cancelSwap(0,1)).to.not.be.reverted;
       });
@@ -599,20 +591,12 @@ describe("ExchangeableRNFT", () => {
         expect((await exchangeableRNFT.swapProp(0)).to).to.be.equal(
           user2.address
         );
-        // the sender of the proposal is the applicant recipient
-        expect((await exchangeableRNFT.swapProp(1)).from).to.be.equal(
-            user1.address
-        )
         // the receiver can reject the swap execution
         await exchangeableRNFT.connect(user2).cancelSwap(0,1);
         // the receiver is removed as transferable owner
         expect((await exchangeableRNFT.swapProp(0)).to).to.be.equal(
             ZERO_ADDRESS
         );
-        // the sender of the proposal is removed as the applicant recipient
-        expect((await exchangeableRNFT.swapProp(1)).from).to.be.equal(
-            ZERO_ADDRESS
-        )
         // user1 is still the owner of the token 0
         expect(await exchangeableRNFT.ownerOf(0)).to.be.equal(user1.address);
         // user2 is still the owner of token 1
@@ -655,20 +639,12 @@ describe("ExchangeableRNFT", () => {
         expect((await exchangeableRNFT.swapProp(0)).to).to.be.equal(
           user2.address
         );
-        // the sender of the proposal is the applicant recipient
-        expect((await exchangeableRNFT.swapProp(1)).from).to.be.equal(
-            user1.address
-        )
         // the receiver can accept the swap
         await exchangeableRNFT.connect(user2).acceptSwap(0, 1);
         // the receiver is removed as transferable owner
         expect((await exchangeableRNFT.swapProp(0)).to).to.be.equal(
             ZERO_ADDRESS
         );
-        // the sender of the proposal is removed as the applicant recipient
-        expect((await exchangeableRNFT.swapProp(1)).from).to.be.equal(
-            ZERO_ADDRESS
-        )
         // user1 is the new owner of the token 1
         expect(await exchangeableRNFT.ownerOf(1)).to.be.equal(user1.address);
         // user2 is the new owner of the token 0
@@ -696,20 +672,12 @@ describe("ExchangeableRNFT", () => {
         expect((await exchangeableRNFT.swapProp(0)).to).to.be.equal(
           user2.address
         );
-        // the sender of the proposal is the applicant recipient
-        expect((await exchangeableRNFT.swapProp(1)).from).to.be.equal(
-            user1.address
-        )
         // the approved user can accept the swap
         await exchangeableRNFT.connect(user3).acceptSwap(0, 1);
         // the receiver is removed as transferable owner
         expect((await exchangeableRNFT.swapProp(0)).to).to.be.equal(
             ZERO_ADDRESS
         );
-        // the sender of the proposal is removed as the applicant recipient
-        expect((await exchangeableRNFT.swapProp(1)).from).to.be.equal(
-            ZERO_ADDRESS
-        )
         // user1 is the new owner of the token 1
         expect(await exchangeableRNFT.ownerOf(1)).to.be.equal(user1.address);
         // user2 is the new owner of the token 0
@@ -733,10 +701,6 @@ describe("ExchangeableRNFT", () => {
         expect((await exchangeableRNFT.swapProp(0)).to).to.be.equal(
           user2.address
         );
-        // the sender of the proposal is the applicant recipient
-        expect((await exchangeableRNFT.swapProp(1)).from).to.be.equal(
-            user1.address
-        )
         //user3 tries to open a new swap proposal involving user2 token
         await expect(exchangeableRNFT
         .connect(user3)

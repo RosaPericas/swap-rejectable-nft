@@ -19,6 +19,7 @@ contract ExNFT is RejNFT, IExNFT {
     }
 
     mapping(uint256 => proposal) public swapProp;
+    mapping(uint256 => bool) public newProposal;
     
     constructor (string memory name_, string memory symbol_)
         RejNFT(name_, symbol_) 
@@ -53,61 +54,44 @@ contract ExNFT is RejNFT, IExNFT {
     ) public virtual {
         require(
             _isApprovedOrOwner(_msgSender(), tokenId1),
-            "ERNFT: transfer caller is not owner nor approved"
+            "ExNFT: transfer caller is not owner nor approved"
         );
 
-        require(swapProp[tokenId1].opened == false && swapProp[tokenId2].opened == false, 
-                "ERNFT: can't open swap proposal");
+        require(!newProposal[tokenId1] && !newProposal[tokenId2], 
+                "ExNFT: can't open swap proposal");
         require(
             from != address(0) && ownerOf(tokenId1) == from,
-            "ERNFT: transfer from incorrect owner"
+            "ExNFT: transfer from incorrect owner"
         );
         require(
             to != address(0) && ownerOf(tokenId2) == to,
-            "ERNFT: transfer to incorrect owner"
+            "ExNFT: transfer to incorrect owner"
         );
         require(deadline > block.timestamp, "Incorrect deadline");
-
 
         // Clear approvals from the previous owner
         _approve(address(0), tokenId1);
 
         swapProp[tokenId1] = proposal(from, to, tokenId1, tokenId2, deadline, true);
-        swapProp[tokenId2] = proposal(from, to, tokenId1, tokenId2, deadline, true);
+        newProposal[tokenId1] = true;
+        newProposal[tokenId2] = true;
 
         emit SwapRequest(from, to, tokenId1, tokenId2, deadline);
     }
 
 
     function acceptSwap(uint256 tokenId1, uint256 tokenId2) public {
-        require(swapProp[tokenId1].opened && swapProp[tokenId2].opened, "ExNFT: Any swap proposal for the provided tokens currently open");
+        require(newProposal[tokenId1] && newProposal[tokenId2], "ExNFT: Any swap proposal for the provided tokens currently open");
         
         require(
-            _isApprovedOrOwner(_msgSender(), tokenId2),
+            _isApprovedOrOwner(_msgSender(), tokenId2) && swapProp[tokenId1].tokenId2 == tokenId2,
             "ExNFT: the caller is neither the receiver nor approved for the token"
         );
-
-        require(
-        keccak256(abi.encode(
-            swapProp[tokenId1].tokenId1, 
-            swapProp[tokenId1].tokenId2, 
-            swapProp[tokenId1].from, 
-            swapProp[tokenId1].to, 
-            swapProp[tokenId1].deadline, 
-            swapProp[tokenId1].opened
-        )) == keccak256(abi.encode(
-            swapProp[tokenId2].tokenId1, 
-            swapProp[tokenId2].tokenId2, 
-            swapProp[tokenId2].from, 
-            swapProp[tokenId2].to, 
-            swapProp[tokenId2].deadline, 
-            swapProp[tokenId2].opened)
-        ), "ExNFT: Different swapProp properties");
 
         require(block.timestamp < swapProp[tokenId1].deadline, "ExNFT: Deadline expired");
 
         address from = swapProp[tokenId1].from;
-        address to = swapProp[tokenId2].to;
+        address to = swapProp[tokenId1].to;
 
         _owners[tokenId1] = to; 
 
@@ -117,24 +101,27 @@ contract ExNFT is RejNFT, IExNFT {
         _owners[tokenId2] = from;
         
         delete swapProp[tokenId1];
-        delete swapProp[tokenId2];
+        newProposal[tokenId1] = false;
+        newProposal[tokenId2] = false;
 
         emit AcceptSwap(from, to, tokenId1, tokenId2);
     }
 
     function cancelSwap(uint256 tokenId1, uint256 tokenId2) public {
-        require(swapProp[tokenId1].opened && swapProp[tokenId2].opened, "Any swap proposal for the provided tokens currently open");
+        require(newProposal[tokenId1] && newProposal[tokenId2], "ExNFT: Any swap proposal for the provided tokens currently open");
         
         require(
-            _isApprovedOrOwner(_msgSender(), tokenId1) || _isApprovedOrOwner(_msgSender(), tokenId2),
+            (_isApprovedOrOwner(_msgSender(), tokenId1) || _isApprovedOrOwner(_msgSender(), tokenId2)) && 
+            swapProp[tokenId1].tokenId1 == tokenId1 &&  swapProp[tokenId1].tokenId2 == tokenId2,
             "ExNFT: reject transfer caller is not the receiver nor approved of the token"
         );
 
         address from = swapProp[tokenId1].from;
-        address to = swapProp[tokenId2].to;
+        address to = swapProp[tokenId1].to;
 
         delete swapProp[tokenId1];
-        delete swapProp[tokenId2];
+        newProposal[tokenId1] = false;
+        newProposal[tokenId2] = false;
 
         emit CancelSwap(from, to, tokenId1, tokenId2);
     }
