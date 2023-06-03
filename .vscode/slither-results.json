@@ -13065,13 +13065,14 @@
 				"type": "function",
 				"name": "acceptSwap",
 				"source_mapping": {
-					"start": 2260,
+					"start": 2240,
 					"length": 953,
 					"filename_relative": "contracts/ExNFT.sol",
 					"filename_absolute": "/Users/rosapericas/Documents/UOC/TFM/swap-rejectable-nft/contracts/ExNFT.sol",
 					"filename_short": "contracts/ExNFT.sol",
 					"is_dependency": false,
 					"lines": [
+						82,
 						83,
 						84,
 						85,
@@ -13096,8 +13097,7 @@
 						104,
 						105,
 						106,
-						107,
-						108
+						107
 					],
 					"starting_column": 5,
 					"ending_column": 6,
@@ -13109,7 +13109,7 @@
 						"name": "ExNFT",
 						"source_mapping": {
 							"start": 212,
-							"length": 3805,
+							"length": 3815,
 							"filename_relative": "contracts/ExNFT.sol",
 							"filename_absolute": "/Users/rosapericas/Documents/UOC/TFM/swap-rejectable-nft/contracts/ExNFT.sol",
 							"filename_short": "contracts/ExNFT.sol",
@@ -13233,8 +13233,7 @@
 								125,
 								126,
 								127,
-								128,
-								129
+								128
 							],
 							"starting_column": 1,
 							"ending_column": 0
@@ -13247,14 +13246,14 @@
 				"type": "node",
 				"name": "require(bool,string)(block.timestamp < swapProp[tokenId1].deadline,ExNFT: Deadline expired)",
 				"source_mapping": {
-					"start": 2685,
+					"start": 2665,
 					"length": 81,
 					"filename_relative": "contracts/ExNFT.sol",
 					"filename_absolute": "/Users/rosapericas/Documents/UOC/TFM/swap-rejectable-nft/contracts/ExNFT.sol",
 					"filename_short": "contracts/ExNFT.sol",
 					"is_dependency": false,
 					"lines": [
-						91
+						90
 					],
 					"starting_column": 9,
 					"ending_column": 90,
@@ -13265,13 +13264,14 @@
 						"type": "function",
 						"name": "acceptSwap",
 						"source_mapping": {
-							"start": 2260,
+							"start": 2240,
 							"length": 953,
 							"filename_relative": "contracts/ExNFT.sol",
 							"filename_absolute": "/Users/rosapericas/Documents/UOC/TFM/swap-rejectable-nft/contracts/ExNFT.sol",
 							"filename_short": "contracts/ExNFT.sol",
 							"is_dependency": false,
 							"lines": [
+								82,
 								83,
 								84,
 								85,
@@ -13296,8 +13296,7 @@
 								104,
 								105,
 								106,
-								107,
-								108
+								107
 							],
 							"starting_column": 5,
 							"ending_column": 6
@@ -13308,7 +13307,7 @@
 								"name": "ExNFT",
 								"source_mapping": {
 									"start": 212,
-									"length": 3805,
+									"length": 3815,
 									"filename_relative": "contracts/ExNFT.sol",
 									"filename_absolute": "/Users/rosapericas/Documents/UOC/TFM/swap-rejectable-nft/contracts/ExNFT.sol",
 									"filename_short": "contracts/ExNFT.sol",
@@ -13432,8 +13431,7 @@
 										125,
 										126,
 										127,
-										128,
-										129
+										128
 									],
 									"starting_column": 1,
 									"ending_column": 0
@@ -13445,10 +13443,10 @@
 				}
 			}
 		],
-		"description": "ExNFT.acceptSwap(uint256,uint256) (contracts/ExNFT.sol#83-108) uses timestamp for comparisons\n\tDangerous comparisons:\n\t- require(bool,string)(block.timestamp < swapProp[tokenId1].deadline,ExNFT: Deadline expired) (contracts/ExNFT.sol#91)\n",
-		"markdown": "[ExNFT.acceptSwap(uint256,uint256)](contracts/ExNFT.sol#L83-L108) uses timestamp for comparisons\n\tDangerous comparisons:\n\t- [require(bool,string)(block.timestamp < swapProp[tokenId1].deadline,ExNFT: Deadline expired)](contracts/ExNFT.sol#L91)\n",
-		"first_markdown_element": "contracts/ExNFT.sol#L83-L108",
-		"id": "569e16449b4386a81a8ee77b238c56a20ae4089dfedb5bfbc63f95684078d9a8",
+		"description": "ExNFT.acceptSwap(uint256,uint256) (contracts/ExNFT.sol#82-107) uses timestamp for comparisons\n\tDangerous comparisons:\n\t- require(bool,string)(block.timestamp < swapProp[tokenId1].deadline,ExNFT: Deadline expired) (contracts/ExNFT.sol#90)\n",
+		"markdown": "[ExNFT.acceptSwap(uint256,uint256)](contracts/ExNFT.sol#L82-L107) uses timestamp for comparisons\n\tDangerous comparisons:\n\t- [require(bool,string)(block.timestamp < swapProp[tokenId1].deadline,ExNFT: Deadline expired)](contracts/ExNFT.sol#L90)\n",
+		"first_markdown_element": "contracts/ExNFT.sol#L82-L107",
+		"id": "73fc82961dbbaa918f26242d9d5bf8636521e1912032b62a806a7a85def6e973",
 		"check": "timestamp",
 		"impact": "Low",
 		"confidence": "Medium"
@@ -13459,13 +13457,14 @@
 				"type": "function",
 				"name": "swapProposal",
 				"source_mapping": {
-					"start": 1154,
-					"length": 1099,
+					"start": 1133,
+					"length": 1100,
 					"filename_relative": "contracts/ExNFT.sol",
 					"filename_absolute": "/Users/rosapericas/Documents/UOC/TFM/swap-rejectable-nft/contracts/ExNFT.sol",
 					"filename_short": "contracts/ExNFT.sol",
 					"is_dependency": false,
 					"lines": [
+						47,
 						48,
 						49,
 						50,
@@ -13497,12 +13496,11 @@
 						76,
 						77,
 						78,
-						79,
-						80
+						79
 					],
 					"starting_column": 5,
 					"ending_column": 6,
-					"_ext_source_hash": "65210f22caf6d71b0b11777a6c28186f"
+					"_ext_source_hash": "e2149316470801ed385d0d725a264032"
 				},
 				"type_specific_fields": {
 					"parent": {
@@ -13510,7 +13508,7 @@
 						"name": "ExNFT",
 						"source_mapping": {
 							"start": 212,
-							"length": 3805,
+							"length": 3815,
 							"filename_relative": "contracts/ExNFT.sol",
 							"filename_absolute": "/Users/rosapericas/Documents/UOC/TFM/swap-rejectable-nft/contracts/ExNFT.sol",
 							"filename_short": "contracts/ExNFT.sol",
@@ -13634,8 +13632,7 @@
 								125,
 								126,
 								127,
-								128,
-								129
+								128
 							],
 							"starting_column": 1,
 							"ending_column": 0
@@ -13646,33 +13643,34 @@
 			},
 			{
 				"type": "node",
-				"name": "require(bool,string)(deadline > block.timestamp,Incorrect deadline)",
+				"name": "require(bool,string)(deadline > block.timestamp,ExNFT: Incorrect deadline)",
 				"source_mapping": {
-					"start": 1868,
-					"length": 57,
+					"start": 1847,
+					"length": 64,
 					"filename_relative": "contracts/ExNFT.sol",
 					"filename_absolute": "/Users/rosapericas/Documents/UOC/TFM/swap-rejectable-nft/contracts/ExNFT.sol",
 					"filename_short": "contracts/ExNFT.sol",
 					"is_dependency": false,
 					"lines": [
-						70
+						69
 					],
 					"starting_column": 9,
-					"ending_column": 66,
-					"_ext_source_hash": "d8e0c44bd8bcb518e5f53c3a745fca17"
+					"ending_column": 73,
+					"_ext_source_hash": "7658cbb9f4eeda18619921a78518b0a6"
 				},
 				"type_specific_fields": {
 					"parent": {
 						"type": "function",
 						"name": "swapProposal",
 						"source_mapping": {
-							"start": 1154,
-							"length": 1099,
+							"start": 1133,
+							"length": 1100,
 							"filename_relative": "contracts/ExNFT.sol",
 							"filename_absolute": "/Users/rosapericas/Documents/UOC/TFM/swap-rejectable-nft/contracts/ExNFT.sol",
 							"filename_short": "contracts/ExNFT.sol",
 							"is_dependency": false,
 							"lines": [
+								47,
 								48,
 								49,
 								50,
@@ -13704,8 +13702,7 @@
 								76,
 								77,
 								78,
-								79,
-								80
+								79
 							],
 							"starting_column": 5,
 							"ending_column": 6
@@ -13716,7 +13713,7 @@
 								"name": "ExNFT",
 								"source_mapping": {
 									"start": 212,
-									"length": 3805,
+									"length": 3815,
 									"filename_relative": "contracts/ExNFT.sol",
 									"filename_absolute": "/Users/rosapericas/Documents/UOC/TFM/swap-rejectable-nft/contracts/ExNFT.sol",
 									"filename_short": "contracts/ExNFT.sol",
@@ -13840,8 +13837,7 @@
 										125,
 										126,
 										127,
-										128,
-										129
+										128
 									],
 									"starting_column": 1,
 									"ending_column": 0
@@ -13853,10 +13849,10 @@
 				}
 			}
 		],
-		"description": "ExNFT.swapProposal(address,address,uint256,uint256,uint256) (contracts/ExNFT.sol#48-80) uses timestamp for comparisons\n\tDangerous comparisons:\n\t- require(bool,string)(deadline > block.timestamp,Incorrect deadline) (contracts/ExNFT.sol#70)\n",
-		"markdown": "[ExNFT.swapProposal(address,address,uint256,uint256,uint256)](contracts/ExNFT.sol#L48-L80) uses timestamp for comparisons\n\tDangerous comparisons:\n\t- [require(bool,string)(deadline > block.timestamp,Incorrect deadline)](contracts/ExNFT.sol#L70)\n",
-		"first_markdown_element": "contracts/ExNFT.sol#L48-L80",
-		"id": "f6478299e0637e2fef28d83adeb68045fd9ff29a1f5bc8d86f946949725f438c",
+		"description": "ExNFT.swapProposal(address,address,uint256,uint256,uint256) (contracts/ExNFT.sol#47-79) uses timestamp for comparisons\n\tDangerous comparisons:\n\t- require(bool,string)(deadline > block.timestamp,ExNFT: Incorrect deadline) (contracts/ExNFT.sol#69)\n",
+		"markdown": "[ExNFT.swapProposal(address,address,uint256,uint256,uint256)](contracts/ExNFT.sol#L47-L79) uses timestamp for comparisons\n\tDangerous comparisons:\n\t- [require(bool,string)(deadline > block.timestamp,ExNFT: Incorrect deadline)](contracts/ExNFT.sol#L69)\n",
+		"first_markdown_element": "contracts/ExNFT.sol#L47-L79",
+		"id": "c5b7aee173fa5c0b5e837e2706b0064d29b82deccf379112c5a706612e3a6ca2",
 		"check": "timestamp",
 		"impact": "Low",
 		"confidence": "Medium"
@@ -26800,7 +26796,7 @@
 				"name": "proposal",
 				"source_mapping": {
 					"start": 252,
-					"length": 163,
+					"length": 142,
 					"filename_relative": "contracts/ExNFT.sol",
 					"filename_absolute": "/Users/rosapericas/Documents/UOC/TFM/swap-rejectable-nft/contracts/ExNFT.sol",
 					"filename_short": "contracts/ExNFT.sol",
@@ -26812,12 +26808,11 @@
 						15,
 						16,
 						17,
-						18,
-						19
+						18
 					],
 					"starting_column": 5,
 					"ending_column": 6,
-					"_ext_source_hash": "a0a0a51e5dbdf1722f0ebf0d167663d6"
+					"_ext_source_hash": "69e03d68f8c754400904059b333b5cfc"
 				},
 				"type_specific_fields": {
 					"parent": {
@@ -26825,7 +26820,7 @@
 						"name": "ExNFT",
 						"source_mapping": {
 							"start": 212,
-							"length": 3805,
+							"length": 3815,
 							"filename_relative": "contracts/ExNFT.sol",
 							"filename_absolute": "/Users/rosapericas/Documents/UOC/TFM/swap-rejectable-nft/contracts/ExNFT.sol",
 							"filename_short": "contracts/ExNFT.sol",
@@ -26949,8 +26944,7 @@
 								125,
 								126,
 								127,
-								128,
-								129
+								128
 							],
 							"starting_column": 1,
 							"ending_column": 0
@@ -26963,9 +26957,9 @@
 				}
 			}
 		],
-		"description": "Struct ExNFT.proposal (contracts/ExNFT.sol#12-19) is not in CapWords\n",
-		"markdown": "Struct [ExNFT.proposal](contracts/ExNFT.sol#L12-L19) is not in CapWords\n",
-		"first_markdown_element": "contracts/ExNFT.sol#L12-L19",
+		"description": "Struct ExNFT.proposal (contracts/ExNFT.sol#12-18) is not in CapWords\n",
+		"markdown": "Struct [ExNFT.proposal](contracts/ExNFT.sol#L12-L18) is not in CapWords\n",
+		"first_markdown_element": "contracts/ExNFT.sol#L12-L18",
 		"id": "b8592b878c13b8e379ba3ef835064e8cc1aa1d04a7eb742de424e4a261c65c4b",
 		"check": "naming-convention",
 		"impact": "Informational",

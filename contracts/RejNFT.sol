@@ -148,7 +148,7 @@ contract RejNFT is ERC721, IRejNFT, Ownable {
      */
     function acceptTransfer(uint256 tokenId) public virtual override {
         require(
-            _transferableOwners[tokenId] == _msgSender() || _isApprovedOrOwner(_msgSender(), tokenId),
+            _transferableOwners[tokenId] == _msgSender(),
             "RejNFT: accept transfer caller is not the receiver of the token"
         );
 

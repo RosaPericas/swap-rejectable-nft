@@ -56,8 +56,9 @@ contract ExNFT is RejNFT, IExNFT {
             "ExNFT: transfer caller is not owner nor approved"
         );
 
-        require(!newProposal[tokenId1] && !newProposal[tokenId2], 
+        require(swapProp[tokenId1].from == address(0) || swapProp[tokenId1].deadline < block.timestamp, 
                 "ExNFT: can't open swap proposal");
+        
         require(
             from != address(0) && ownerOf(tokenId1) == from,
             "ExNFT: transfer from incorrect owner"
@@ -66,7 +67,7 @@ contract ExNFT is RejNFT, IExNFT {
             to != address(0) && ownerOf(tokenId2) == to,
             "ExNFT: transfer to incorrect owner"
         );
-        require(deadline > block.timestamp, "Incorrect deadline");
+        require(deadline > block.timestamp, "ExNFT: Incorrect deadline");
 
         // Clear approvals from the previous owner
         _approve(address(0), tokenId1);
@@ -80,10 +81,12 @@ contract ExNFT is RejNFT, IExNFT {
 
 
     function acceptSwap(uint256 tokenId1, uint256 tokenId2) public {
-        require(newProposal[tokenId1] && newProposal[tokenId2], "ExNFT: Any swap proposal for the provided tokens currently open");
+        require(newProposal[tokenId2], "ExNFT: Any swap proposal for the provided token");
         
+        require(swapProp[tokenId1].tokenId2 == tokenId2, "ExNFT: any swap proposal for $tokenId1$ provided or the swap proposal for $tokenId2$ does not correspond with the given $tokenId2$");
+
         require(
-            _isApprovedOrOwner(_msgSender(), tokenId2) && swapProp[tokenId1].tokenId2 == tokenId2,
+            _isApprovedOrOwner(_msgSender(), tokenId2),
             "ExNFT: the caller is neither the receiver nor approved for the token"
         );
 
@@ -112,7 +115,7 @@ contract ExNFT is RejNFT, IExNFT {
         require(
             (_isApprovedOrOwner(_msgSender(), tokenId1) || _isApprovedOrOwner(_msgSender(), tokenId2)) && 
             swapProp[tokenId1].tokenId1 == tokenId1 &&  swapProp[tokenId1].tokenId2 == tokenId2,
-            "ExNFT: reject transfer caller is not the receiver nor approved of the token"
+            "ExNFT: reject transfer caller is not the receiver or the sender nor approved of the token"
         );
 
         address from = swapProp[tokenId1].from;
