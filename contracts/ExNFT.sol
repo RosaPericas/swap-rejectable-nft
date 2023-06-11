@@ -92,6 +92,8 @@ contract ExNFT is RejNFT, IExNFT {
 
         require(block.timestamp < swapProp[tokenId1].deadline, "ExNFT: Deadline expired");
 
+        require(swapProp[tokenId2].from == address(0) || swapProp[tokenId2].deadline < block.timestamp, "ExNFT: can't accept swap tokenId2 must cancel their opened swap proposal");
+
         address from = swapProp[tokenId1].from;
         address to = swapProp[tokenId1].to;
 
