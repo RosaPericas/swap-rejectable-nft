@@ -6,6 +6,7 @@ import "@nomiclabs/hardhat-solhint";
 import "hardhat-deploy";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
+import { url } from "inspector";
 
 dotenvConfig({ path: resolve(__dirname, "./.env") });
 
@@ -19,6 +20,7 @@ const CHAIN_IDS = {
 const MNEMONIC = process.env.MNEMONIC || "";
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY || "";
 const INFURA_API_KEY = process.env.INFURA_API_KEY || "";
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "";
 
 const getInfuraURL = (network: string) => {
   return `https://${network}.infura.io/v3/${INFURA_API_KEY}`;
@@ -28,10 +30,13 @@ const config = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
-      chainId: CHAIN_IDS.HARDHAT,
+      /* chainId: CHAIN_IDS.HARDHAT,
       accounts: { mnemonic: MNEMONIC },
       blockGasLimit: 4000000,
-      gas: "auto"
+      gas: "auto" */
+      forking: {
+        url: getInfuraURL("mainnet"), //Mainnet forking 
+      }
     },
     mainnet: {
       url: getInfuraURL("mainnet"),
@@ -65,7 +70,8 @@ const config = {
     coinmarketcap: COINMARKETCAP_API_KEY,
     token: "ETH",//"MATIC",
     gasPriceApi:
-      "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice" //"https://api.polygonscan.com/api?module=proxy&action=eth_gasPrice"
+      `https://api.etherscan.io/v2/api?chainid=1&module=proxy&action=eth_gasPrice&apikey=${ETHERSCAN_API_KEY}`, //"https://api.polygonscan.com/api?module=proxy&action=eth_gasPrice"
+    enabled: true,
   },
   /*namedAccounts: {
     deployer: {

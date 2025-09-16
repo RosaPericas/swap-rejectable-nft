@@ -575,7 +575,7 @@ describe("ExchangeableRNFT", () => {
     it("Can't set a deadline lower than now", async () => {
       await expect(exchangeableNFT
         .connect(user1)
-        .swapProposal(user1.address, user2.address, 0, 1, Math.floor(Date.now() / 1000))).to.be.reverted;
+        .swapProposal(user1.address, user2.address, 0, 1, Math.floor(Date.now() / 1000)- 10000)).to.be.reverted;
     });
 
     it("Open swap proposal", async () => {
@@ -742,7 +742,7 @@ describe("ExchangeableRNFT", () => {
         expect((await exchangeableNFT.swapProp(0)).from).to.be.equal(
             user1.address
         )
-        const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+        const sleep = (ms: any) => new Promise(r => setTimeout(r, ms));
         await sleep(2000);
 
         // the receiver can't accept swap
@@ -900,7 +900,7 @@ describe("ExchangeableRNFT", () => {
           .connect(user1)
           .swapProposal(user1.address, user2.address, 0, 1, deadline)).to.be.reverted;
 
-        const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+        const sleep = (ms: any) => new Promise(r => setTimeout(r, ms));
         await sleep(5000);
 
         //user1 can open a new swap proposal with token 0
