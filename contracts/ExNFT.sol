@@ -98,11 +98,13 @@ contract ExNFT is RejNFT, IExNFT {
         address to = swapProp[tokenId1].to;
 
         _owners[tokenId1] = to; 
+        emit Transfer(from, to, tokenId1);
 
         // Clear approvals from the previous owner
         _approve(address(0), tokenId2);
         
         _owners[tokenId2] = from;
+        emit Transfer(to, from, tokenId2);
         
         delete swapProp[tokenId1];
         newProposal[tokenId1] = false;
